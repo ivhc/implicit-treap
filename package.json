@@ -1,0 +1,26 @@
+{
+  "name": "implicit-treap",
+  "version": "1.0.0",
+  "description": "",
+  "main": "implicit-treap.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/IvanHonchar/implicit-treap.git"
+  },
+  "keywords": [
+    "implicit",
+    "treap",
+    "binary",
+    "tree",
+    "heap"
+  ],
+  "author": "Ivan Honchar <honchar.ia@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/IvanHonchar/implicit-treap/issues"
+  },
+  "homepage": "https://github.com/IvanHonchar/implicit-treap#readme"
+}
