@@ -93,7 +93,6 @@ ImplicitTreap.prototype.fromArray = function(array) {
 };
 
 ImplicitTreap.prototype.remove = function(pos) {
-  if (!this.root) throw new Error('the treap is empty');
   const [oldLeft, right] = this._split(pos, this.root);
   const [left, removedNode] = this._split(pos - 1, oldLeft);
   this.root = this._merge(left, right);
@@ -115,9 +114,8 @@ ImplicitTreap.prototype.get = function(index) {
 };
 
 ImplicitTreap.prototype.merge = function(right) {
-  const resultTreap = new ImplicitTreap(this.recalc);
-  resultTreap.root = this.root = this._merge(this.root, right.root);
-  return resultTreap;
+  this.root = this._merge(this.root, right.root);
+  return this;
 };
 
 ImplicitTreap.prototype.split = function(index) {
