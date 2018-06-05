@@ -25,6 +25,7 @@ ImplicitTreap.prototype._recalc = function(node) {
   if (node.left) node.size += node.left.size;
   if (node.right) node.size += node.right.size;
   this.recalc(node);
+  return node;
 };
 
 ImplicitTreap.prototype._push = function(node) {
@@ -44,33 +45,27 @@ ImplicitTreap.prototype._merge = function(left, right) {
   if (!right) return left;
   if (left.priority > right.priority) {
     left.right = this._merge(left.right, right);
-    this._recalc(left);
-    return left;
+    return this._recalc(left);
   } else {
     right.left = this._merge(left, right.left);
-    this._recalc(right);
-    return right;
+    return this._recalc(right);
   }
 };
 
 ImplicitTreap.prototype._split = function(index, node) {
   this._push(node);
-  let temp = null, left, right;
   const currentIndex = (node.left ? node.left.size : 0) + 1;
   if (currentIndex <= index) {
-    if (node.right === null) right = null;
-    else [temp, right] = this._split(index - currentIndex, node.right);
-    left = node;
-    left.right = temp;
-    this._recalc(left);
+    if (!node.right) return [this._recalc(node), null];
+    const [leftRight, right] = this._split(index - currentIndex, node.right);
+    node.right = leftRight;
+    return [this._recalc(node), right];
   } else {
-    if (node.left === null) left = null;
-    else [left, temp] = this._split(index, node.left);
-    right = node;
-    right.left = temp;
-    this._recalc(right);
+    if (!node.left) return [null, this._recalc(node)];
+    const [left, rightLeft] = this._split(index, node.left);
+    node.left = rightLeft;
+    return [left, this._recalc(node)];
   }
-  return [left, right];
 };
 
 ImplicitTreap.prototype.insert = function(pos, data) {
@@ -93,28 +88,28 @@ ImplicitTreap.prototype.fromArray = function(array) {
 };
 
 ImplicitTreap.prototype.remove = function(pos) {
-  const [oldLeft, right] = this._split(pos, this.root);
-  const [left, removedNode] = this._split(pos - 1, oldLeft);
+  const [oldLeft, right] = this._split(pos + 1, this.root);
+  const [left, removedNode] = this._split(pos, oldLeft);
   this.root = this._merge(left, right);
   return removedNode.data;
 };
 
-ImplicitTreap.prototype.get = function(index) {
+ImplicitTreap.prototype.peek = function(index) {
   let node = this.root;
   while (true) {
     this._push(node);
-    const currentIndex = (node.left ? node.left.size : 0) + 1;
+    const currentIndex = node.left ? node.left.size : 0;
     if (currentIndex === index) return node.data;
     else if (currentIndex > index) node = node.left;
     else {
-      index -= currentIndex;
+      index -= currentIndex + 1;
       node = node.right;
     }
   }
 };
 
-ImplicitTreap.prototype.merge = function(right) {
-  this.root = this._merge(this.root, right.root);
+ImplicitTreap.prototype.concat = function(...treaps) {
+  for (const treap of treaps) this.root = this._merge(this.root, treap.root);
   return this;
 };
 
@@ -126,18 +121,24 @@ ImplicitTreap.prototype.split = function(index) {
 };
 
 ImplicitTreap.prototype.rangeQuery = function(l, r, query) {
-  const [leftMiddle, right] = this._split(r, this.root);
-  const [left, middle] = this._split(l - 1, leftMiddle);
+  const [leftMiddle, right] = this._split(r + 1, this.root);
+  const [left, middle] = this._split(l, leftMiddle);
   const answer = middle[query];
   this.root = this._merge(this._merge(left, middle), right);
   return answer;
 };
 
 ImplicitTreap.prototype.rangeUpdate = function(l, r, fn) {
-  const [leftMiddle, right] = this._split(r, this.root);
-  const [left, middle] = this._split(l - 1, leftMiddle);
+  const [leftMiddle, right] = this._split(r + 1, this.root);
+  const [left, middle] = this._split(l, leftMiddle);
   middle.queue.push(fn);
   this.root = this._merge(this._merge(left, middle), right);
+};
+
+ImplicitTreap.prototype.update = function(index, data) {
+  this.rangeUpdate(index, index, (node) => {
+    node.data = data;
+  });
 };
 
 ImplicitTreap.prototype[Symbol.iterator] = function() {

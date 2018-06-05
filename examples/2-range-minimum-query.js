@@ -10,4 +10,4 @@ const treap = new ImplicitTreap(node => {
   if (node.right) node.min = min(node.min, node.right.min);
 }).fromArray([66, 49, 10, 20, 35, 58, 99, 13, 28, 77]);
 
-console.log(treap.rangeQuery(5, 9, 'min'));
+console.log(treap.rangeQuery(4, 8, 'min'));
